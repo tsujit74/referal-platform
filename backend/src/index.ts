@@ -6,7 +6,6 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import mongoSanitize from "express-mongo-sanitize";
 import { connectDB } from "./config/db";
 
 // Routes
@@ -31,9 +30,6 @@ if (process.env.NODE_ENV === "development") {
 
 // Body parser
 app.use(express.json());
-
-// Data sanitization against NoSQL injection
-app.use(mongoSanitize());
 
 // Rate limiting
 const limiter = rateLimit({
