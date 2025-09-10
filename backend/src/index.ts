@@ -7,6 +7,8 @@ import { connectDB } from "./config/db";
 
 // Routes
 import authRoutes from "./routes/authRoutes";
+import profileRoutes from "./routes/profileRoutes";
+import referralRoutes from "./routes/referralRoutes";
 
 const app = express();
 
@@ -16,6 +18,8 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/referral", referralRoutes);
 
 // Health Check
 app.get("/", (_req: Request, res: Response) => {
