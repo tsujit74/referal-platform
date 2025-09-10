@@ -3,6 +3,10 @@ dotenv.config();
 
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
 import { connectDB } from "./config/db";
 
 // Routes
@@ -10,13 +14,36 @@ import authRoutes from "./routes/authRoutes";
 import profileRoutes from "./routes/profileRoutes";
 import referralRoutes from "./routes/referralRoutes";
 
-const app = express();
+const app = express(); 
 
-// Middleware
-app.use(cors());
+// Security headers
+app.use(helmet());
+
+// CORS
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+}));
+
+// Logging
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// Body parser
 app.use(express.json());
 
-// Routes
+// Data sanitization against NoSQL injection
+app.use(mongoSanitize());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
+  message: "Too many requests from this IP, please try again later",
+});
+app.use(limiter);
+
+//  ROUTES 
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/referral", referralRoutes);
@@ -40,7 +67,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-// Start Server
+
 const PORT = process.env.PORT || 4000;
 
 connectDB()
