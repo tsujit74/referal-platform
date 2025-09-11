@@ -23,7 +23,7 @@ It provides secure login/signup, profile management, referral posting, and a pub
 
 * ✅ **Referral status tracking** (Pending, Accepted, Closed).
 * ✅ **Public referral feed** for all users.
-* ❌ Search/filter referrals (future enhancement).
+* ✅ Search/filter referrals.
 * ❌ Basic messaging between referrer & candidate (future enhancement).
 
 ---
