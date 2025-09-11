@@ -74,8 +74,8 @@ Password: HireMe@2025!
 ### 1. Clone Repository
 
 ```bash
-git clone <your-repo-url>
-cd referral-platform
+git clone https://github.com/tsujit74/referal-platform
+cd referal-platform
 ```
 
 ### 2. Setup Backend
