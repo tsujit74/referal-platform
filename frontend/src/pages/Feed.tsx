@@ -1,10 +1,10 @@
 // src/pages/Feed.tsx
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, RefreshCcw, ThumbsUp, MessageCircle } from "lucide-react";
+import {  RefreshCcw } from "lucide-react";
 import api from "../api/api";
 import { useError } from "../context/ErrorContext";
-import { useSuccess } from "../context/SuccessContext";
+//import { useSuccess } from "../context/SuccessContext";
 
 interface Referral {
   _id: string;
@@ -18,7 +18,7 @@ interface Referral {
 
 export default function Feed() {
   const { setErrors } = useError();
-  const { addMessage } = useSuccess();
+  //const { addMessage } = useSuccess();
 
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
