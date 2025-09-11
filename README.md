@@ -10,6 +10,12 @@ It provides secure login/signup, profile management, referral posting, and a pub
 
 ---
 
+## Live Demo
+
+[Referal Platform Live](https://referal-platform-1.onrender.com/) 
+
+---
+
 ## ✨ Features
 
 ### ✅ MVP (Must-Have)
