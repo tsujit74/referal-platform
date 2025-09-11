@@ -11,6 +11,7 @@ import ErrorDisplay from "./components/ErrorDisplay";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import { AuthContext } from "./context/authContext";
+import Feed from "./pages/Feed";
 // import ReferralForm from "./pages/ReferralForm";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -56,6 +57,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/public-feed" element={<Feed/>} />
         </Routes>
       </main>
       <Footer />
