@@ -57,7 +57,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? "/auth/login" : "/auth/register";
+      const endpoint = isLogin ? "/auth/login" : "/auth/signup";
       const res = await api.post(endpoint, form);
 
       if (isLogin) {
