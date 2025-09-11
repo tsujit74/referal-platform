@@ -47,7 +47,7 @@ export default function Footer() {
 
         {/* Footer Note */}
         <p className="text-gray-500 text-sm text-center">
-          &copy; {new Date().getFullYear()} Quizzy. All rights reserved.
+          &copy; {new Date().getFullYear()} ReferralPlatform. All rights reserved.
         </p>
       </div>
     </footer>

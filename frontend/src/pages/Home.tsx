@@ -30,7 +30,7 @@ export default function Home() {
           </div>
           <div className="md:w-1/2 text-center mt-8 md:mt-0">
             <img
-              src="/images/Referral.png"
+              src="/images/Hero.png"
               alt="Referral illustration"
               className="rounded-2xl shadow-md max-h-80 mx-auto"
             />

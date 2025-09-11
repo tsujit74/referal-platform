@@ -11,7 +11,7 @@ const ErrorDisplay = () => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
         clearErrors();
-      }, 3000); // 3 seconds
+      }, 3000); 
       return () => clearTimeout(timer);
     }
   }, [errors, clearErrors]);

@@ -1,7 +1,9 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
-import { useApi } from "../api/api";
+import api from "../api/api";
+import { useError } from "../context/ErrorContext";
+import { useSuccess } from "../context/SuccessContext";
 
 interface FormState {
   name: string;
@@ -11,22 +13,47 @@ interface FormState {
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const [form, setForm] = useState<FormState>({ name: "", email: "", password: "" });
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
 
   const { login } = useContext(AuthContext);
-  const api = useApi();
+  const { setErrors, clearErrors } = useError();
+  const { addMessage, clearMessages } = useSuccess();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    const errors: string[] = [];
+    if (!form.email.includes("@")) {
+      errors.push("Please enter a valid email address.");
+    }
+    if (form.password.length < 6) {
+      errors.push("Password must be at least 6 characters long.");
+    }
+    if (!isLogin && !form.name.trim()) {
+      errors.push("Full name is required for registration.");
+    }
+    if (errors.length) {
+      setErrors(errors);
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    clearErrors();
+    clearMessages();
+
+    if (!validateForm()) return;
     setLoading(true);
 
     try {
@@ -34,83 +61,121 @@ export default function AuthPage() {
       const res = await api.post(endpoint, form);
 
       if (isLogin) {
-        const { token, user } = res.data;
+        const token = res.data.token || res.data.data?.token;
+        const user = res.data.user || res.data.data?.user;
+
         if (token && user) {
           login(token, user);
-          navigate("/");
+          addMessage("Logged in successfully!");
+          navigate("/dashboard");
         } else {
-          setError("Login failed. Please try again.");
+          setErrors(["Invalid email or password."]);
         }
       } else {
-        alert("Account created successfully! Please login.");
+        addMessage("Account created successfully! Please login.");
         setIsLogin(true);
         setForm({ name: "", email: "", password: "" });
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Something went wrong.");
+      console.error("Auth error:", err);
+
+      if (err.response) {
+        // backend responded
+        if (err.response.status === 401) {
+          setErrors(["Invalid email or password."]);
+        } else if (err.response.data?.message) {
+          setErrors([err.response.data.message]);
+        } else {
+          setErrors(["Something went wrong. Please try again."]);
+        }
+      } else if (err.request) {
+        // network / server down
+        setErrors([
+          "Unable to reach server. Please check your network and try again.",
+        ]);
+      } else {
+        // unexpected
+        setErrors(["An unexpected error occurred. Please try again later."]);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold text-center mb-6">
-          {isLogin ? "Login" : "Register"}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-indigo-50 px-4">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md transition-all duration-300">
+        <h2 className="text-3xl font-bold text-center mb-6 text-indigo-700">
+          {isLogin ? "Welcome Back 👋" : "Create Your Account"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {!isLogin && (
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md"
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
+              <input
+                name="name"
+                placeholder="Enter your full name"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                required
+              />
+            </div>
           )}
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-            required
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              value={form.email}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              value={form.password}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              required
+            />
+          </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition disabled:opacity-50"
           >
-            {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
+            {loading ? "Processing..." : isLogin ? "Login" : "Register"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          {isLogin ? "Don’t have an account?" : "Already have an account?"}{" "}
+        <p className="mt-6 text-center text-sm text-gray-600">
+          {isLogin ? "Don’t have an account?" : "Already registered?"}{" "}
           <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-indigo-600 font-medium"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              clearErrors();
+              clearMessages();
+            }}
+            className="text-indigo-600 font-semibold hover:underline"
           >
-            {isLogin ? "Register" : "Login"}
+            {isLogin ? "Register here" : "Login here"}
           </button>
         </p>
       </div>

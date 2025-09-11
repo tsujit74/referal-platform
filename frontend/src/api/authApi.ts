@@ -1,4 +1,3 @@
-// src/api/authApi.ts
 import api from "./api";
 
 export interface SignupData {
@@ -21,19 +20,16 @@ export interface AuthResponse {
   };
 }
 
-// Signup
 export const signup = async (data: SignupData): Promise<AuthResponse> => {
-  const response = await api.post("/auth/signup", data);
+  const response = await api.post("/auth/register", data);
   return response.data;
 };
 
-// Login
 export const login = async (data: LoginData): Promise<AuthResponse> => {
   const response = await api.post("/auth/login", data);
   return response.data;
 };
 
-// Get current logged-in user
 export const getCurrentUser = async () => {
   const response = await api.get("/auth/me");
   return response.data;
